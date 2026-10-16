@@ -1,0 +1,6 @@
+{
+  "name": "Tracks League",
+  "description": "Train tracks puzzle game with ladder levels, leaderboards, and sound effects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
