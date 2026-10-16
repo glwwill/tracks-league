@@ -126,3 +126,6 @@ button.link { border: none; background: none; padding: 4px; color: var(--accent)
 .board-table th, .board-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); }
 .board-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 .board-table tr.me td { background: var(--clue); font-weight: 600; }
+
+.pill.sound { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; }
+.pill.sound[aria-pressed='false'] { color: var(--muted); }

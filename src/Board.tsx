@@ -1,6 +1,7 @@
 import { useRef, type PointerEvent as RPointerEvent, type ReactNode } from 'react';
 import type { Mask, PuzzleSpec } from './engine';
 import { changeEdge, clueSet, hasEdge, neighbour, type Snapshot } from './game';
+import { sfx } from './sound';
 
 const S = 56; // cell size in SVG units
 const RAIL = 6; // distance of each rail from the centre line
@@ -105,7 +106,7 @@ export default function Board({ puzzle, state, mistakes, solved, onChange, onBeg
   const { width: w, height: h } = puzzle;
   const svgRef = useRef<SVGSVGElement>(null);
   const locked = clueSet(puzzle);
-  const drag = useRef<{ last: number; mode: 'add' | 'remove' | null; moved: boolean; began: boolean } | null>(null);
+  const drag = useRef<{ last: number; mode: 'add' | 'remove' | null; moved: boolean; began: boolean; count: number } | null>(null);
   const live = useRef(state);
   live.current = state;
 
@@ -133,7 +134,8 @@ export default function Board({ puzzle, state, mistakes, solved, onChange, onBeg
     const i = cellAt(e);
     if (i < 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    drag.current = { last: i, mode: null, moved: false, began: false };
+    sfx.unlock();
+    drag.current = { last: i, mode: null, moved: false, began: false, count: 0 };
   };
 
   const onMove = (e: RPointerEvent<SVGSVGElement>) => {
@@ -158,6 +160,9 @@ export default function Board({ puzzle, state, mistakes, solved, onChange, onBeg
         marks[i] = false;
         const snap = { masks: next, marks };
         live.current = snap;
+        g.count += 1;
+        if (g.mode === 'add') sfx.place(g.count);
+        else sfx.erase();
         onChange(snap);
       }
     }
@@ -176,6 +181,8 @@ export default function Board({ puzzle, state, mistakes, solved, onChange, onBeg
     drag.current = null;
     const marks = cur.marks.slice();
     marks[g.last] = !marks[g.last];
+    if (marks[g.last]) sfx.mark();
+    else sfx.unmark();
     onChange({ masks: cur.masks, marks });
   };
 

@@ -3,6 +3,7 @@ import { api, type GameInfo, type PublicUser } from './api';
 import Board from './Board';
 import { isValidSolution } from './engine';
 import { initialSnapshot, type Snapshot } from './game';
+import { sfx } from './sound';
 
 const LEVEL_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
@@ -37,6 +38,7 @@ export default function GameScreen({ onUserChange }: { onUserChange: (u: PublicU
       .then((r) => {
         if (r.ok && r.user) {
           setEarned(r.points ?? 0);
+          sfx.solve();
           onUserChange(r.user);
         } else {
           setError('The server did not accept that solution. Try again or skip.');
@@ -51,6 +53,7 @@ export default function GameScreen({ onUserChange }: { onUserChange: (u: PublicU
   }, [snap]);
 
   const undo = () => {
+    sfx.click();
     setPast((p) => {
       if (!p.length) return p;
       setSnap(p[p.length - 1]);
@@ -60,16 +63,19 @@ export default function GameScreen({ onUserChange }: { onUserChange: (u: PublicU
 
   const reset = () => {
     if (!game || !snap) return;
+    sfx.thunk();
     setPast((p) => [...p, snap]);
     setSnap(initialSnapshot(game.puzzle));
   };
 
   const next = () => {
+    sfx.click();
     setGame(null);
     api.current().then(show).catch((e: Error) => setError(e.message));
   };
 
   const skip = () => {
+    sfx.thunk();
     setGame(null);
     api.skip().then(show).catch((e: Error) => setError(e.message));
   };
